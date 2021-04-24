@@ -27,6 +27,7 @@ import com.example.android.codelabs.paging.data.GithubRepository
 import com.example.android.codelabs.paging.model.RepoSearchResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -53,16 +54,26 @@ constructor(
         }
     }
 
+    private val currentQuery = MutableStateFlow<String?>(null)
+    val searchResults = currentQuery
+        .flatMapLatest { queryString ->
+            queryString?.let {
+                repository.getSearchResultStream(queryString)
+            } ?: emptyFlow()
+        }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
     /**
      * Search a repository based on a query string.
      */
     fun searchRepo(queryString: String) {
-        queryLiveData.postValue(queryString)
+        //queryLiveData.postValue(queryString)
+        currentQuery.value = queryString
     }
 
     fun listScrolled(visibleItemCount: Int, lastVisibleItemPosition: Int, totalItemCount: Int) {
         if (visibleItemCount + lastVisibleItemPosition + VISIBLE_THRESHOLD >= totalItemCount) {
-            val immutableQuery = queryLiveData.value
+            //val immutableQuery = queryLiveData.value
+            val immutableQuery = currentQuery.value
             if (immutableQuery != null) {
                 viewModelScope.launch {
                     repository.requestMore(immutableQuery)

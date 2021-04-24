@@ -23,6 +23,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +32,7 @@ import androidx.recyclerview.widget.RecyclerView.OnScrollListener
 import com.example.android.codelabs.paging.databinding.ActivitySearchRepositoriesBinding
 import com.example.android.codelabs.paging.model.RepoSearchResult
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collect
 
 @AndroidEntryPoint
 class SearchRepositoriesActivity : AppCompatActivity() {
@@ -45,9 +47,6 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         binding = ActivitySearchRepositoriesBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
-
-        // get the view model
-        viewModel
 
         // add dividers between RecyclerView's row items
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
@@ -69,21 +68,40 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
     private fun initAdapter() {
         binding.list.adapter = adapter
-        viewModel.repoResult.observe(this) { result ->
-            when (result) {
-                is RepoSearchResult.Success -> {
-                    showEmptyList(result.data.isEmpty())
-                    adapter.submitList(result.data)
-                }
-                is RepoSearchResult.Error -> {
-                    Toast.makeText(
-                        this,
-                        "\uD83D\uDE28 Wooops $result.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+
+        lifecycleScope.launchWhenStarted {
+            viewModel.searchResults.collect { result ->
+                when(result) {
+                    is RepoSearchResult.Success -> {
+                        showEmptyList(result.data.isEmpty())
+                        adapter.submitList(result.data)
+                    }
+                    is RepoSearchResult.Error -> {
+                        Toast.makeText(
+                            this@SearchRepositoriesActivity,
+                            "\uD83D\uDE28 Wooops $result.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
                 }
             }
         }
+
+//        viewModel.repoResult.observe(this) { result ->
+//            when (result) {
+//                is RepoSearchResult.Success -> {
+//                    showEmptyList(result.data.isEmpty())
+//                    adapter.submitList(result.data)
+//                }
+//                is RepoSearchResult.Error -> {
+//                    Toast.makeText(
+//                        this,
+//                        "\uD83D\uDE28 Wooops $result.message}",
+//                        Toast.LENGTH_LONG
+//                    ).show()
+//                }
+//            }
+//        }
     }
 
     private fun initSearch(query: String) {
