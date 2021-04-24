@@ -21,20 +21,23 @@ import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnScrollListener
-import com.example.android.codelabs.paging.Injection
 import com.example.android.codelabs.paging.databinding.ActivitySearchRepositoriesBinding
 import com.example.android.codelabs.paging.model.RepoSearchResult
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class SearchRepositoriesActivity : AppCompatActivity() {
 
+    private val viewModel: SearchRepositoriesViewModel by viewModels()
+
     private lateinit var binding: ActivitySearchRepositoriesBinding
-    private lateinit var viewModel: SearchRepositoriesViewModel
     private val adapter = ReposAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,8 +47,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         setContentView(view)
 
         // get the view model
-        viewModel = ViewModelProvider(this, Injection.provideViewModelFactory())
-            .get(SearchRepositoriesViewModel::class.java)
+        viewModel
 
         // add dividers between RecyclerView's row items
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)

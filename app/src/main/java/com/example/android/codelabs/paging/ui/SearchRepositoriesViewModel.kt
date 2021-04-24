@@ -25,14 +25,21 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.example.android.codelabs.paging.data.GithubRepository
 import com.example.android.codelabs.paging.model.RepoSearchResult
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * ViewModel for the [SearchRepositoriesActivity] screen.
  * The ViewModel works with the [GithubRepository] to get the data.
  */
-class SearchRepositoriesViewModel(private val repository: GithubRepository) : ViewModel() {
+@HiltViewModel
+class SearchRepositoriesViewModel
+@Inject
+constructor(
+    private val repository: GithubRepository
+) : ViewModel() {
 
     companion object {
         private const val VISIBLE_THRESHOLD = 5
