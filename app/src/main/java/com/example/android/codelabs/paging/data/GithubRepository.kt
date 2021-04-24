@@ -20,6 +20,7 @@ import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import com.example.android.codelabs.paging.Constants.ApiConstants.Companion.NETWORK_PAGE_SIZE
 import com.example.android.codelabs.paging.api.GithubService
 import com.example.android.codelabs.paging.api.IN_QUALIFIER
 import com.example.android.codelabs.paging.model.Repo
@@ -55,9 +56,5 @@ constructor(
                 GithubPagingSource(service, query)
             }
         ).flow
-    }
-
-    companion object {
-        const val NETWORK_PAGE_SIZE = 50
     }
 }

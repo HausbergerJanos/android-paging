@@ -2,10 +2,11 @@ package com.example.android.codelabs.paging.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.example.android.codelabs.paging.Constants.ApiConstants.Companion.NETWORK_PAGE_SIZE
 import com.example.android.codelabs.paging.api.GithubService
 import com.example.android.codelabs.paging.api.IN_QUALIFIER
-import com.example.android.codelabs.paging.data.GithubRepository.Companion.NETWORK_PAGE_SIZE
 import com.example.android.codelabs.paging.model.Repo
+import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -19,6 +20,7 @@ class GithubPagingSource(
         val apiQuery = query + IN_QUALIFIER
 
         return try {
+            delay(2000)
             val response = service.searchRepos(apiQuery, position, params.loadSize)
             val repose = response.items
             val nextKey = if (repose.isEmpty()) {
